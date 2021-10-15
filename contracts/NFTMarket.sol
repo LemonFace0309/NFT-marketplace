@@ -39,7 +39,7 @@ contract NFTMarket is ReentrancyGuard {
     bool sold
   );
 
-  function getListingPrivate() public view returns (uint256) {
+  function getListingPrice() public view returns (uint256) {
     return listingPrice;
   }
 
