@@ -47,5 +47,6 @@ module.exports = {
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'no-console': 'off',
     'tailwind/class-order': 'off',
+    'react/prop-types': 'off',
   },
 };
