@@ -62,7 +62,7 @@ const Home = () => {
     loadNFTs();
   };
 
-  if (isLoading && !nfts.length) return <h1 className="px-20 py-10 text-3xl">No items in marketplace</h1>;
+  if (isLoading || !nfts.length) return <h1 className="px-20 py-10 text-3xl">No items in marketplace</h1>;
 
   return (
     <div className="flex justify-center">
