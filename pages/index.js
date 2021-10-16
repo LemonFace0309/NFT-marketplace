@@ -13,7 +13,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const loadNFTs = async () => {
-    const provider = new ethers.providers.JsonRpcProvider();
+    const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_PROVIDER);
     const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
     const marketContract = new ethers.Contract(nftMarketAddress, Market.abi, provider);
     const data = await marketContract.fetchMarketItems();
