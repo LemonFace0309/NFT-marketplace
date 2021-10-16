@@ -20,12 +20,13 @@ const CreatorDashboard = () => {
     const signer = provider.getSigner();
 
     const marketContract = new ethers.Contract(nftMarketAddress, Market.abi, signer);
-    const toeknContract = new ethers.Contract(nftAddress, NFT.abi, provider);
+    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
     const data = await marketContract.fetchItemsCreated();
+    console.debug('data:', data);
 
     const items = await Promise.all(
       data.map(async (item) => {
-        const tokenUri = await toeknContract.tokenURI(item.tokenId);
+        const tokenUri = await tokenContract.tokenURI(item.tokenId);
         const meta = await axios.get(tokenUri);
         const price = ethers.utils.formatUnits(item.price.toString(), 'ether');
         const newItem = {
@@ -33,7 +34,7 @@ const CreatorDashboard = () => {
           tokenId: item.tokenId.toNumber(),
           seller: item.seller,
           owner: item.owner,
-          image: meta.data.iamge,
+          image: meta.data.image,
         };
         return newItem;
       })
@@ -58,7 +59,7 @@ const CreatorDashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
           {nfts.map((nft) => (
             <div key={nft.tokenId} className="border shadow rounded-xl overflow-hidden">
-              <img src={nft.image} alt="An NFT" className="rounded" />
+              <img src={nft.image} alt="An NFT" className="rounded-t" />
               <div className="p-4 bg-black">
                 <p className="text-2xl font-bold text-white">Price - {nft.price} Eth</p>
               </div>
@@ -67,12 +68,12 @@ const CreatorDashboard = () => {
         </div>
       </div>
       <div className="px-4">
-        {sold.length && (
+        {Boolean(sold.length) && (
           <div>
             <h2 className="text-2xl py-2">Items sold</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
               {sold.map((nft) => (
-                <div key={nft.tokenId} className="border shadow rounded-xl overflow-hidden">
+                <div key={nft.tokenId} className="border shadow rounded-t-xl overflow-hidden">
                   <img src={nft.image} className="rounded" alt="An NFT" />
                   <div className="p-4 bg-black">
                     <p className="text-2xl font-bold text-white">Price - {nft.price} Eth</p>

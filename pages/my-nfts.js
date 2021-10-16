@@ -19,12 +19,12 @@ const MyNFTs = () => {
     const signer = provider.getSigner();
 
     const marketContract = new ethers.Contract(nftMarketAddress, Market.abi, signer);
-    const toeknContract = new ethers.Contract(nftAddress, NFT.abi, provider);
+    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
     const data = await marketContract.fetchMyNFTs();
 
     const items = await Promise.all(
       data.map(async (item) => {
-        const tokenUri = await toeknContract.tokenURI(item.tokenId);
+        const tokenUri = await tokenContract.tokenURI(item.tokenId);
         const meta = await axios.get(tokenUri);
         const price = ethers.utils.formatUnits(item.price.toString(), 'ether');
         const newItem = {
