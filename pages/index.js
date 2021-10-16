@@ -16,26 +16,30 @@ const Home = () => {
     const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_PROVIDER);
     const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
     const marketContract = new ethers.Contract(nftMarketAddress, Market.abi, provider);
-    const data = await marketContract.fetchMarketItems();
+    try {
+      const data = await marketContract.fetchMarketItems();
 
-    const items = await Promise.all(
-      data.map(async (item) => {
-        const tokenUri = await tokenContract.tokenURI(item.tokenId);
-        const meta = await axios.get(tokenUri);
-        const price = ethers.utils.formatUnits(item.price.toString(), 'ether');
-        const newItem = {
-          price,
-          tokenId: item.tokenId.toNumber(),
-          seller: item.seller,
-          owner: item.owner,
-          image: meta.data.image,
-          name: meta.data.name,
-          description: meta.data.description,
-        };
-        return newItem;
-      })
-    );
-    setNfts(items);
+      const items = await Promise.all(
+        data.map(async (item) => {
+          const tokenUri = await tokenContract.tokenURI(item.tokenId);
+          const meta = await axios.get(tokenUri);
+          const price = ethers.utils.formatUnits(item.price.toString(), 'ether');
+          const newItem = {
+            price,
+            tokenId: item.tokenId.toNumber(),
+            seller: item.seller,
+            owner: item.owner,
+            image: meta.data.image,
+            name: meta.data.name,
+            description: meta.data.description,
+          };
+          return newItem;
+        })
+      );
+      setNfts(items);
+    } catch (err) {
+      console.debug('Error:', err);
+    }
     setIsLoading(false);
   };
 
