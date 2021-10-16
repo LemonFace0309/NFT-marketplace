@@ -35,21 +35,26 @@ const CreateNFT = () => {
     const connection = await web3Modal.connect();
     const provider = new ethers.providers.Web3Provider(connection);
     const signer = provider.getSigner();
+    console.debug('test');
 
     let contract = new ethers.Contract(nftAddress, NFT.abi, signer);
+    console.debug('url:', url);
     let transaction = await contract.createToken(url);
+    console.debug('test2');
     const tx = await transaction.wait();
+    console.debug('test3');
 
     const event = tx.events[0];
     const value = event.args[2];
     const tokenId = value.toNumber();
 
     const price = ethers.utils.parseUnits(formInput.price, 'ether');
+    console.debug('price:', price);
 
     contract = new ethers.Contract(nftMarketAddress, Market.abi, signer);
     let listingPrice = await contract.getListingPrice();
     listingPrice = listingPrice.toString();
-    console.debug(listingPrice);
+    console.debug('listingPrice:', listingPrice);
 
     transaction = await contract.createMarketItem(nftAddress, tokenId, price, { value: listingPrice });
     await transaction.wait();
@@ -95,7 +100,7 @@ const CreateNFT = () => {
           onChange={(e) => setFormInput({ ...formInput, price: e.target.value })}
         />
         <input type="file" name="Asset" className="my-4" onChange={uploadFile} />
-        {fileUrl && <img className="rounded mt-4" width="350" src={fileUrl} alt="NFT Token" />}
+        {fileUrl && <img className="rounded mt-4" width="350" src={fileUrl} alt="An NFT" />}
         <button onClick={createNFT} className="font-bold mt-4 bg-pink-500 text-white rounded p-4 shadow-lg">
           Create Digital Asset
         </button>
