@@ -35,26 +35,20 @@ const CreateNFT = () => {
     const connection = await web3Modal.connect();
     const provider = new ethers.providers.Web3Provider(connection);
     const signer = provider.getSigner();
-    console.debug('test');
 
     let contract = new ethers.Contract(nftAddress, NFT.abi, signer);
-    console.debug('url:', url);
     let transaction = await contract.createToken(url);
-    console.debug('test2');
     const tx = await transaction.wait();
-    console.debug('test3');
 
     const event = tx.events[0];
     const value = event.args[2];
     const tokenId = value.toNumber();
 
     const price = ethers.utils.parseUnits(formInput.price, 'ether');
-    console.debug('price:', price);
 
     contract = new ethers.Contract(nftMarketAddress, Market.abi, signer);
     let listingPrice = await contract.getListingPrice();
     listingPrice = listingPrice.toString();
-    console.debug('listingPrice:', listingPrice);
 
     transaction = await contract.createMarketItem(nftAddress, tokenId, price, { value: listingPrice });
     await transaction.wait();
