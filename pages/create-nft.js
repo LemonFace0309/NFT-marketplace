@@ -6,6 +6,7 @@ import { ethers } from 'ethers';
 import { create } from 'ipfs-http-client';
 import { useRouter } from 'next/router';
 import Web3Modal from 'web3modal';
+import { getSession, signIn, signOut } from 'next-auth/client';
 
 import { nftAddress, nftMarketAddress } from '../config';
 import NFT from '../artifacts/contracts/NFT.sol/NFT.json';
@@ -19,13 +20,24 @@ const CreateNFT = () => {
   const [fileUrl, setFileUrl] = useState(null);
   const [formInput, setFormInput] = useState({ price: '', name: '', description: '' });
   const [tracks, setTracks] = useState([]);
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const initSpotifySession = async () => {
+    const session = await getSession();
+    setLoading(false);
+    setSession(session);
+  };
 
   useEffect(() => {
+    initSpotifySession();
     const id = '7n2Ycct7Beij7Dj7meI4X0';
     axios
       .get(`https://api.spotify.com/v1/artists/${id}/top-tracks?market=CA`, {
         headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID}`,
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SPOTIFY_REQUEST_TRACKS}`,
         },
       })
       .then((res) => {
@@ -35,6 +47,23 @@ const CreateNFT = () => {
       .catch((err) => {
         console.warn(err);
       });
+    // fetch('https://api.spotify.com/v1/artists/7n2Ycct7Beij7Dj7meI4X0/top-tracks?market=CA', {
+    //   headers: {
+    //     Accept: 'application/json',
+    //     Authorization: `Bearer ${process.env.NEXT_PUBLIC_SPOTIFY_REQUEST_TRACKS}`,
+    //     'Content-Type': 'application/json',
+    //   },
+    // })
+    //   .then((res) => {
+    //     return res.json();
+    //   })
+    //   .then((data) => {
+    //     console.debug(data);
+    //     setTracks(data.tracks);
+    //   })
+    //   .catch((err) => {
+    //     console.warn(err);
+    //   });
   }, []);
 
   // const uploadFile = async (e) => {
@@ -114,15 +143,17 @@ const CreateNFT = () => {
     const artistArr = track.artists;
     const artists = artistArr.map((trackObj) => trackObj.name).join(' & ');
     setFormInput({ ...formInput, name: `${artists} - ${track.name}` });
-    setImageURL(track.album.images[1].url);
+    setImageURL(track.album.images[0].url);
   };
 
   return (
     <div className="flex justify-center">
       <div className="p-6 w-1/2 grid grid-cols-3 gap-4">
+        {!session && !loading && <button onClick={() => signIn()}>Sign in to spotify</button>}
+        {session && !loading && <button onClick={() => signOut()}>Sign out</button>}
         {tracks.map((track) => (
           <div key={track.id} className="cursor-pointer" onClick={() => handleClicked(track)}>
-            <img key={track.id} alt={track.name} src={track.album.images[1].url} />
+            <img key={track.id} alt={track.name} src={track.album.images[0].url} />
             <p className="text-center">{track.name}</p>
           </div>
         ))}

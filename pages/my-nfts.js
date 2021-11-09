@@ -21,6 +21,7 @@ const MyNFTs = () => {
     const marketContract = new ethers.Contract(nftMarketAddress, Market.abi, signer);
     const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
     const data = await marketContract.fetchMyNFTs();
+    console.debug(3);
 
     const items = await Promise.all(
       data.map(async (item) => {
